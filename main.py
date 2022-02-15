@@ -51,7 +51,8 @@ def convert_PeMS_txt_to_csv(file, destination_directory):
 def convert_PeMS_dataset_csv_to_npy(source_directory, destination_directory):
     for filename in os.listdir(source_directory):
         convert_PeMS_csv_to_npy(os.path.join(source_directory, filename), destination_directory)
-        break
+
+
 
 
 def get_timestamp_range_from_npy_directory(npy_directory):
@@ -59,7 +60,7 @@ def get_timestamp_range_from_npy_directory(npy_directory):
     timestamp_range = [float('inf'), float('-inf')]
 
     for filename in os.listdir(npy_directory):
-        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True)
+        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True).transpose()
         timestamp_range[0] = min(timestamp_range[0], np_data[0].min()) # np_data[0] refers to the timestamp column
         timestamp_range[1] = max(timestamp_range[1], np_data[0].max())
 
@@ -70,7 +71,7 @@ def get_station_set_from_npy_directory(npy_directory):
     ''' Given a directory of .npy files, return a set of all possible stations '''
     stations = set()
     for filename in os.listdir(npy_directory):
-        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True)
+        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True).transpose()
         stations.update(np_data[1]) # np_data[1] refers to the station column
 
     return stations
@@ -91,6 +92,8 @@ def convert_PeMS_csv_to_npy(filepath, destination_directory):
 
     filebasename = os.path.basename(filepath)
     filerawname = os.path.splitext(filebasename)[0]
+
+    series = series.transpose()
     np.save(os.path.join(destination_directory, filerawname + NPY_EXTENSION), series)
 
     print(series.shape) # [col, row]
@@ -117,7 +120,7 @@ def create_master_series(npy_directory):
 
     for station in stations:
         series_sample = [station]
-        series_sample.extend([None]*num_timesteps)
+        series_sample.extend([np.NaN]*num_timesteps)
         series.append(np.array(series_sample, dtype=object))
 
     series = np.array(series, dtype=object)
@@ -126,21 +129,26 @@ def create_master_series(npy_directory):
     df = pd.DataFrame(series)
     #print(df)
 
-
+    j = 0
     for filename in os.listdir(npy_directory):
-        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True).transpose()
-        i = 0
+        j+=1
+        print(filename, j)
+        np_data = np.load(os.path.join(npy_directory, filename), allow_pickle=True)
         for sample in np_data:
-            print(i)
-            i+=1
             timestamp, station, total_flow = sample[0], sample[1], sample[2]
             timestep_index = (timestamp - timestamp_origin) // 300
             #print(df.loc[df[0] == station][0]) Gets the row/sample where the first column (station) equals to station
             df.loc[df[0] == station, timestep_index + 1] = total_flow
 
+
+        if j % 10 == 0:
+            series = df.to_numpy()
+            np.save(os.path.join(npy_directory, 'MASTER' + str(j) + NPY_EXTENSION), series)
+
+
     print(df)
     series = df.to_numpy()
-    np.save(os.path.join(npy_directory, 'MASTER' + NPY_EXTENSION), series)
+    np.save(os.path.join(npy_directory, 'MASTER_FINAL' + NPY_EXTENSION), series)
     return series
 
 
@@ -168,7 +176,7 @@ def create_master_series(npy_directory):
 
 if __name__ == '__main__':
     #extract_PeMS_gz_dataset(GZ_DIR, CSV_DIR)
-    convert_PeMS_dataset_csv_to_npy(CSV_DIR, NPY_DIR)
+    #convert_PeMS_dataset_csv_to_npy(CSV_DIR, NPY_DIR)
     #print(get_timestamp_range_from_npy_directory(NPY_DIR))
     create_master_series(NPY_DIR)
 
