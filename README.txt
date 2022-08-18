@@ -19,7 +19,9 @@ Place the /dataset, /preprocessed_data, main.py, and PeMS.py directories and fil
 preprocessed_data and dataset Directories
 -------------------------------------------------
 Note that the directories in /preprocessed_data and /dataset are empty.
-The actual directories are made public on a dropbox due to its large size. Download them and replace the empty directories
+The actual directories are made public on a dropbox due to its large size.
+Download them and replace the empty directories:
+https://www.dropbox.com/s/t2fnuo6qmanggc6/dataset.zip?dl=0
 
 
 
