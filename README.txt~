@@ -90,11 +90,6 @@ Then you could repeat the process for other stations in different districts
 for different years. If all is successful, your pickle directory should look
 like the directory of station_data/2019/district_3.
 
-
-
-----------------------------------------------------------------------
-dataset
-----------------------------------------------------------------------
 After acquiring a directory full of station .pickle files, you would run the
 code in main.py to take those preprocessed files and transform them into
 respective training and dataset files. Here, you can tune the parameters of
@@ -104,15 +99,11 @@ PREMADE_TRAINING_DATA, and PREMADE_TESTING_DATA. If all is successful, your
 dataset should look like:
 model_data/test_year2019_district3_stations400_days56_period30min_history144s_forecast24s.npz
 
-I have already provided you with the dataset I used for my project. Notice in
-the main.py code, specifically the __main__ function, I commented out the call
-to transform the .pickle files to a .npz dataset file. I recommend you
-uncomment and run the code to see if your .pickle files list that you created
-can successfully generate a dataset file. This process may take several
-minutes depending on your dataset parameters.
-
-The dataset directory is the environment to store your station (.pickle) files and your
-dataset (.npz) files.
-
 Congratulations! You are able to create a training and/or testing dataset to
 be used in your model for pairwise training given just a list of .gz files. 
+
+-------------------------------------------------------------------------
+dataset
+-------------------------------------------------------------------------
+The dataset directory is the environment to store your station (.pickle) files and your
+dataset (.npz) files.
